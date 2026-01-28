@@ -4,75 +4,149 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 
-# --- CONFIG ---
-API_KEY = "AIzaSyCYpxVSiwIwPmkt0Wi_Wc33C6FqG7VKJTc"
+# --- 1. CONFIG & SECRETS ---
+API_KEY = st.secrets["AIzaSyCYpxVSiwIwPmkt0Wi_Wc33C6FqG7VKJTc"]
 genai.configure(api_key=API_KEY)
 
-# --- 1. OTONOM VERİ TOPLAMA SİSTEMİ ---
-def get_autonomous_intel():
-    # Google News ve Sektörel RSS'lerden en sıcak 3 gelişme
-    url = "https://news.google.com/rss/search?q=Germany+work+visa+news&hl=en-US&gl=US&ceid=US:en"
-    try:
-        r = requests.get(url)
-        soup = BeautifulSoup(r.content, features="xml")
-        titles = [item.title.text for item in soup.findAll('item')[:3]]
-        return " | ".join(titles)
-    except:
-        return "Mavi Kart güncellemeleri ve konut piyasası trendleri."
-
-# --- 2. TASARIM ---
+# --- 2. NYT STYLE CUSTOM CSS (Arayüzü kusursuzlaştıran kısım) ---
 st.set_page_config(page_title="DeutschInsider", page_icon="🇩🇪", layout="wide")
 
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Playfair+Display:wght@700&display=swap');
-    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-    .logo-box { background: #000; color: #fff; padding: 5px 15px; font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; }
-    .brand-container { display: flex; align-items: center; gap: 15px; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 30px; }
-    .premium-lock { background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #f9f9f9 100%); padding: 60px; text-align: center; border: 1px dashed #ccc; margin-top: -100px; }
-    .footer { font-size: 11px; color: #888; text-align: center; margin-top: 100px; padding: 40px; border-top: 1px solid #eee; }
+    /* Google Fonts Entegrasyonu */
+    @import url('https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+    
+    /* Genel Arkaplan ve Fontlar */
+    html, body, [class*="css"] { 
+        font-family: 'Libre Franklin', sans-serif; 
+        color: #121212;
+        background-color: #ffffff;
+    }
+    
+    /* GEREKSİZ STREAMLIT ELEMENTLERİNİ GİZLEME (GitHub, Rerun, Footer vb.) */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    .stDeployButton {display:none;}
+    
+    /* New York Times Header Stili */
+    .nyt-header {
+        text-align: center;
+        border-bottom: 2px solid #121212;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+    }
+    .nyt-logo {
+        font-family: 'Playfair Display', serif;
+        font-size: 65px;
+        font-weight: 700;
+        letter-spacing: -2px;
+        color: #000;
+        margin-bottom: 0px;
+    }
+    .nyt-sub {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 400;
+        margin-top: -10px;
+    }
+    
+    /* Yazı Boyutlarını Büyütme */
+    h1, h2, h3 { font-family: 'Playfair Display', serif; }
+    p, li { font-size: 20px !important; line-height: 1.6; color: #333; }
+    
+    /* Rapor Kartı ve Premium Kilit */
+    .report-container {
+        max-width: 850px;
+        margin: auto;
+        padding: 20px;
+    }
+    .premium-overlay {
+        background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 80%);
+        padding: 60px;
+        text-align: center;
+        border-top: 1px solid #eee;
+        margin-top: -150px;
+        position: relative;
+    }
+    
+    /* Şık Buton */
+    .stButton>button {
+        background-color: #000;
+        color: #fff;
+        border: 1px solid #000;
+        padding: 12px 40px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-radius: 0px;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-# HEADER
-st.markdown("<div class='brand-container'><div class='logo-box'>DI</div><div style='font-size: 24px; letter-spacing: 4px;'>DEUTSCHINSIDER</div></div>", unsafe_allow_html=True)
+# --- 3. HEADER (NYT LOGO & DATE) ---
+current_date = datetime.date.today().strftime("%A, %B %d, %Y")
+st.markdown(f"""
+    <div class='nyt-header'>
+        <div class='nyt-logo'>DeutschInsider</div>
+        <div class='nyt-sub'>STRATEGIC CAREER INTELLIGENCE FOR PROFESSIONALS</div>
+        <div style='font-size: 13px; margin-top: 10px; border-top: 1px solid #eee; padding-top: 5px;'>
+            {current_date.upper()} | LATEST MARKET UPDATES
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-tabs = st.tabs(["📊 GÜNLÜK ANALİZ", "📁 ARŞİV", "💎 ÜYELİK", "⚖️ YASAL"])
+# --- 4. ANA İÇERİK (MANŞET) ---
+st.markdown("<div class='report-container'>", unsafe_allow_html=True)
 
-with tabs[0]:
-    intel = get_autonomous_intel()
-    st.write(f"**Son Güncelleme:** {datetime.date.today().strftime('%d.%m.%Y')} | **Sinyaller:** {intel}")
-    st.markdown("## Stratejik İstihbarat Raporu #2026-112")
-    st.write("""
-    Almanya'da nitelikli göçmenlik yasasında yapılan son revizyonlar, özellikle IT ve mühendislik alanındaki 
-    yabancı profesyoneller için vize bekleme sürelerini eyalet bazlı olarak %30 oranında azaltmayı hedefliyor. 
-    Ancak, Berlin ve Münih'teki konut kayıt (Anmeldung) krizleri, bu süreci operasyonel olarak zorlaştırıyor.
+tab1, tab2, tab3 = st.tabs(["LATEST REPORT", "THE ARCHIVE", "MEMBERSHIP"])
+
+with tab1:
+    st.markdown("## 2026 Salary Benchmarks: The Quiet Shift in German IT Hubs")
+    st.markdown("*Analysis by DI Strategic Unit*")
     
-    Profesyonel ekibimizin yaptığı analizlere göre, bu ay öne çıkan 3 kritik risk faktörü şunlardır:
-    1. Eyalet bazlı vergi avantajlarının değişimi.
-    2. Sigorta primlerindeki yeni kesinti oranları.
+    # Rapor Metni
+    st.write("""
+    As the new fiscal quarter begins, the German Ministry of Labor has quietly adjusted the threshold for high-demand 
+    professional sectors. While public focus remains on general immigration numbers, the real movement is happening 
+    within the 'Opportunity Card' (Chancenkarte) selection criteria, where linguistic versatility is now weighted 
+    more heavily than pure academic credentials.
+    
+    For engineers and software developers currently negotiating contracts in Berlin and Munich, a new legal 
+    precedent regarding 'Inflation Adjustment Clauses' has emerged. This single factor could determine whether 
+    your net income remains stable or erodes by 4% over the next 18 months...
     """)
     
+    # Premium Paywall
     st.markdown("""
-        <div style='height: 100px;'></div>
-        <div class='premium-lock'>
-            <h3>🔒 Analizin Devamı ve Aksiyon Planı Kilitli</h3>
-            <p>2026 maaş pazarlığı stratejileri ve yasal koruma rehberine erişmek için Premium üyeliğe geçin.</p>
-            <br>
+        <div style='height: 200px;'></div>
+        <div class='premium-overlay'>
+            <h3 style='font-size: 28px;'>Access the Full Intelligence Report</h3>
+            <p style='font-size: 18px !important;'>Join our Professional tier to unlock the complete 2026 action plan, 
+            exclusive salary data, and bureaucratic shortcuts.</p>
         </div>
     """, unsafe_allow_html=True)
-    st.button("TÜM RAPORLARI AÇ (199 TL / AY)")
+    
+    if st.button("Subscribe to Unlock"):
+        st.write("Redirecting to secure payment...")
 
-# --- 3. HUKUKİ METİNLER (Footers) ---
-with tabs[3]:
-    st.markdown("### Yasal Bilgilendirmeler")
-    with st.expander("Mesafeli Satış Sözleşmesi"):
-        st.write("""
-        **1. TARAFLAR:** İşbu sözleşme DeutschInsider (SATICI) ile hizmetten faydalanan (ALICI) arasındadır.
-        **2. KONU:** Dijital içerik ve stratejik analiz bülten aboneliği hizmetidir.
-        **3. İPTAL:** 6502 sayılı Kanun gereği dijital ortamda anında ifa edilen hizmetlerde cayma hakkı bulunmamaktadır.
-        """)
-    with st.expander("Gizlilik ve Veri Politikası"):
-        st.write("Kişisel verileriniz KVKK kapsamında sadece hizmet sunumu ve ödeme doğrulama amacıyla işlenmektedir.")
+with tab2:
+    st.markdown("### The Intelligence Archive")
+    st.write("Browse previous strategic reports and deep-dives.")
+    st.info("Archive access is limited to Professional members.")
 
-st.markdown("<div class='footer'>© 2026 DeutschInsider | iyzico Güvenli Ödeme Altyapısı | <a href='#'>Destek</a></div>", unsafe_allow_html=True)
+with tab3:
+    st.markdown("### Professional Membership")
+    st.write("Get daily market signals and legal navigation directly to your dashboard.")
+    st.write("**$19 / month**")
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# --- 5. FOOTER ---
+st.markdown("""
+    <div style='text-align: center; padding: 50px; border-top: 1px solid #eee; margin-top: 50px; font-size: 12px; color: #999;'>
+        © 2026 DEUTSCHINSIDER STRATEGIC INTELLIGENCE. ALL RIGHTS RESERVED.<br>
+        <a href='#' style='color: #999;'>Terms of Service</a> | <a href='#' style='color: #999;'>Privacy Policy</a>
+    </div>
+    """, unsafe_allow_html=True)
