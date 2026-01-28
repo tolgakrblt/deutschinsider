@@ -112,25 +112,28 @@ with tab1:
     professional sectors. While public focus remains on general immigration numbers, the real movement is happening 
     within the 'Opportunity Card' (Chancenkarte) selection criteria, where linguistic versatility is now weighted 
     more heavily than pure academic credentials.
-    
-    For engineers and software developers currently negotiating contracts in Berlin and Munich, a new legal 
-    precedent regarding 'Inflation Adjustment Clauses' has emerged. This single factor could determine whether 
-    your net income remains stable or erodes by 4% over the next 18 months...
     """)
-    
-    # Premium Paywall
+
+    # --- PROFESYONEL LİNK VE PAYWALL ---
     st.markdown("""
-        <div style='height: 200px;'></div>
+        <div style='height: 150px; background: linear-gradient(transparent, white);'></div>
         <div class='premium-overlay'>
-            <h3 style='font-size: 28px;'>Access the Full Intelligence Report</h3>
-            <p style='font-size: 18px !important;'>Join our Professional tier to unlock the complete 2026 action plan, 
-            exclusive salary data, and bureaucratic shortcuts.</p>
+            <h3 style='font-size: 26px; font-family: "Playfair Display", serif;'>Unlock the Full Intelligence Report</h3>
+            <p style='font-size: 18px !important; color: #666;'>
+                To continue reading this analysis and access our 2026 salary database, 
+                <a href='#membership-tab' style='color: #000; font-weight: 700; text-decoration: underline;'>become a Professional Member</a>.
+            </p>
+            <div style='margin-top: 20px;'>
+                <a href='https://iyzi.link/SİZİN_IYZICO_LİNKİNİZ' target='_blank' 
+                   style='background-color: #000; color: #fff; padding: 12px 35px; text-decoration: none; font-weight: 700; font-size: 14px; letter-spacing: 1px; display: inline-block;'>
+                   SUBSCRIBE NOW — $19/MO
+                </a>
+            </div>
+            <p style='font-size: 13px !important; margin-top: 15px; color: #999;'>
+                Already a member? <a href='#' style='color: #666;'>Sign in here.</a>
+            </p>
         </div>
     """, unsafe_allow_html=True)
-    
-    if st.button("Subscribe to Unlock"):
-        st.write("Redirecting to secure payment...")
-
 with tab2:
     st.markdown("### The Intelligence Archive")
     st.write("Browse previous strategic reports and deep-dives.")
@@ -150,4 +153,5 @@ st.markdown("""
         <a href='#' style='color: #999;'>Terms of Service</a> | <a href='#' style='color: #999;'>Privacy Policy</a>
     </div>
     """, unsafe_allow_html=True)
+
 
