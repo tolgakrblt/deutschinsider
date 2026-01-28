@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import datetime
 
 # --- 1. CONFIG & SECRETS ---
-API_KEY = st.secrets["AIzaSyCYpxVSiwIwPmkt0Wi_Wc33C6FqG7VKJTc"]
+API_KEY = "AIzaSyCYpxVSiwIwPmkt0Wi_Wc33C6FqG7VKJTc"
 genai.configure(api_key=API_KEY)
 
 # --- 2. NYT STYLE CUSTOM CSS (Arayüzü kusursuzlaştıran kısım) ---
@@ -150,3 +150,4 @@ st.markdown("""
         <a href='#' style='color: #999;'>Terms of Service</a> | <a href='#' style='color: #999;'>Privacy Policy</a>
     </div>
     """, unsafe_allow_html=True)
+
